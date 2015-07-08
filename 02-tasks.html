@@ -11,6 +11,7 @@
 <script type="text/javascript" src="/scripts/tasks-controller.js"></script>
 <script type="text/javascript" src="/scripts/jquery.validate.js"></script>
 <script type="text/javascript" src="/scripts/tasks-webstorage.js"></script>
+<script type="text/javascript" src="/scripts/tasks-indexeddb.js"></script>
 
 </head>
 <body>
@@ -104,10 +105,29 @@
 	<footer>Você tem <span id="taskCount"></span> tarefas</footer>
 </body>
 <script>
+if (window.indexedDB) {
+	$.getScript( "scripts/tasks-indexeddb.js" )
+	.done(function( script, textStatus ) {
+		initMetodo();
+	})
+	.fail(function( jqxhr, settings, exception ) {
+		console.log( 'Failed to load indexed db script' );
+	});
+} else if (window.localStorage) {
+	$.getScript( "scripts/tasks-webstorage.js" )
+	.done(function( script, textStatus ) {
+		initMetodo();
+	})
+	.fail(function( jqxhr, settings, exception ) {
+		console.log( 'Failed to load web storage script' );
+	});
+}
+function initMetodo(){
 	$(document).ready(function() {
 		tasksController.init($('#taskPage'));
 		tasksController.loadTasks();
 	});
+}
 </script>
 <script id="taskRow" type="text/x-jQuery-tmpl">
 <tr>
