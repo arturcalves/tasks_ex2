@@ -24,6 +24,7 @@ tasksController = function() {
                 		storageEngine.delete('task', $(evt.target).data().taskId, 
                 			function() {
                 				$(evt.target).parents('tr').remove(); 
+                				$('#taskCount').html(Number($('#taskCount').html())-1);
                 			}, errorLogger);
                 	}
                 );
@@ -57,6 +58,7 @@ tasksController = function() {
     	loadTasks : function() {
         	storageEngine.findAll('task', 
         		function(tasks) {
+        			$('#taskCount').html(tasks.length);
         			$.each(tasks, function(index, task) {
         				$('#taskRow').tmpl(task ).appendTo( $(taskPage ).find( '#tblTasks tbody'));
         			});
