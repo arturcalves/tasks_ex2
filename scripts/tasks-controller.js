@@ -65,6 +65,12 @@ tasksController = function() {
         			$('#taskCount').html(tasks.length);
         			$.each(tasks, function(index, task) {
         				$('#taskRow').tmpl(task ).appendTo( $(taskPage ).find( '#tblTasks tbody'));
+        				if( Date.today().compareTo(Date.parse(task.requiredBy)) === 1){
+        					$('time[datetime='+task.requiredBy+']').closest('td').siblings( ).andSelf( ).addClass('overdue');
+        				}
+        				else if( Date.next().week().compareTo(Date.parse(task.requiredBy)) === 1){
+        					$('time[datetime='+task.requiredBy+']').closest('td').siblings( ).andSelf( ).addClass('warning');
+        				}
         			});
         		}, 
         		errorLogger);
