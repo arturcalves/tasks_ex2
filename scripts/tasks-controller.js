@@ -74,6 +74,9 @@ tasksController = function() {
         	storageEngine.findAll('task', 
         		function(tasks) {
         			var qtdTarefasIncompletas = 0;
+        			tasks.sort(function compare(a,b) {
+  									return Date.parse(a.requiredBy).compareTo(Date.parse(b.requiredBy))
+        			});
         			$.each(tasks, function(index, task) {
         				$('#taskRow').tmpl(task ).appendTo( $(taskPage ).find( '#tblTasks tbody'));
         				if(task.completed == 'true'){
