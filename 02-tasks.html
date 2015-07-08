@@ -21,6 +21,7 @@
 		<section id="taskCreation" class="not">
 			<form id="taskForm">
 				<input type="hidden" name="id" />
+				<input type="hidden" name="completed" value='false' />
 				<div>
 					<label>Tarefa</label> 
 					<input type="text" required="required" name="task" class="large" placeholder="Estudar e programar" maxlength="200" />
@@ -116,7 +117,7 @@
 	<td>
 		<nav>
 			<a href="#" class="editRow" data-task-id="${id}">Editar</a>
-			<a href="#">Completar</a>
+			<a href="#" class="completeRow" data-task-id="${id}">Completar</a>
 			<a href="#" class="deleteRow" data-task-id="${id}">Deletar</a>
 		</nav>
 	</td>

@@ -23,9 +23,20 @@ tasksController = function() {
                 		console.log('teste');
                 		storageEngine.delete('task', $(evt.target).data().taskId, 
                 			function() {
-                				$(evt.target).parents('tr').remove(); 
-                				$('#taskCount').html(Number($('#taskCount').html())-1);
+                				$(taskPage).find('#tblTasks tbody').empty();
+	                			tasksController.loadTasks();
                 			}, errorLogger);
+                	}
+                );
+                $(taskPage).find('#tblTasks tbody').on('click', '.completeRow', 
+                	function(evt) { 					
+                		storageEngine.findById('task', $(evt.target).data().taskId, function(task) {
+                			task.completed = 'true';
+							storageEngine.save('task', task, function() {
+	                			$(taskPage).find('#tblTasks tbody').empty();
+	                			tasksController.loadTasks();
+	                		}, errorLogger);
+                		}, errorLogger);
                 	}
                 );
                 $(taskPage).find('#tblTasks tbody').on('click', '.editRow', 
@@ -62,16 +73,25 @@ tasksController = function() {
     	loadTasks : function() {
         	storageEngine.findAll('task', 
         		function(tasks) {
-        			$('#taskCount').html(tasks.length);
+        			var qtdTarefasIncompletas = 0;
         			$.each(tasks, function(index, task) {
         				$('#taskRow').tmpl(task ).appendTo( $(taskPage ).find( '#tblTasks tbody'));
-        				if( Date.today().compareTo(Date.parse(task.requiredBy)) === 1){
-        					$('time[datetime='+task.requiredBy+']').closest('td').siblings( ).andSelf( ).addClass('overdue');
+        				if(task.completed == 'true'){
+        					$('a[data-task-id='+task.id+']').parents('tr').addClass('taskCompleted');
+        					$('a[data-task-id='+task.id+'][class=completeRow]').remove();
+        					$('a[data-task-id='+task.id+'][class=editRow]').remove();
         				}
-        				else if( Date.next().week().compareTo(Date.parse(task.requiredBy)) === 1){
-        					$('time[datetime='+task.requiredBy+']').closest('td').siblings( ).andSelf( ).addClass('warning');
+        				else{
+        					qtdTarefasIncompletas++;
+        					if( Date.today().compareTo(Date.parse(task.requiredBy)) === 1){
+        						$('time[datetime='+task.requiredBy+']').closest('td').siblings( ).andSelf( ).addClass('overdue');
+        					}
+        					else if( Date.next().week().compareTo(Date.parse(task.requiredBy)) === 1){
+        						$('time[datetime='+task.requiredBy+']').closest('td').siblings( ).andSelf( ).addClass('warning');
+        					}
         				}
         			});
+        			$('#taskCount').html(qtdTarefasIncompletas);
         		}, 
         		errorLogger);
         }
