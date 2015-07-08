@@ -48,6 +48,10 @@ tasksController = function() {
                 		}, errorLogger);
                 	}
                 });
+                $(taskPage).find('#clearTask').click(function(evt) {
+                	evt.preventDefault();
+                	$(taskPage).find('#taskForm')[0].reset();
+                });
 				storageEngine.init(function() {
                 	storageEngine.initObjectStore('task', function() {}, 
                 	errorLogger) 
