@@ -1,17 +1,13 @@
 storageEngine = function() {
-	var request;
-	var databasename;
 	var database;
-	var initialized = false;
+	var objectStores;
 	return {
 		init : function(successCallback, errorCallback) {
 			if (window.indexedDB) {
-				databasename = window.location.hostname+'DB'
-				request = window.indexedDB.open(databasename);
+				var request = indexedDB.open(window.location.hostname+'DB');
 				request.onsuccess = function(event) {
 					database = request.result;
 					successCallback(null);
-					initialized = true;
 				}
 				request.onerror = function(event) {
 					errorCallback('storage_not_initalized', 'It is not possible to initialized storage');
@@ -21,9 +17,9 @@ storageEngine = function() {
 			}			
 		},
 		initObjectStore  : function(type, successCallback, errorCallback) {
-			if (!initialized) {
+	    	if (!database) {
 				errorCallback('storage_api_not_initialized', 'The storage engine has not been initialized');
-			} 
+			}
 	    	var exists = false;
 	    	$.each(database.objectStoreNames, function(i, v) {
 	    		  if (v == type) {
@@ -35,7 +31,7 @@ storageEngine = function() {
 	    	} else {
 		    	var version = database.version+1;
 		    	database.close();
-		    	request = window.indexedDB.open(window.location.hostname+'DB', version);
+		    	var request = indexedDB.open(window.location.hostname+'DB', version);
 				request.onsuccess = function(event) {
 					successCallback(null);
 				}
@@ -45,14 +41,14 @@ storageEngine = function() {
 				request.onupgradeneeded = function(event) {
 					database = event.target.result;
 			    	var objectStore = database.createObjectStore(type, { keyPath: "id", autoIncrement: true });
-					
+					successCallback(null);
 				}
 	    	}
 	    },
-	    save : function(type, obj, successCallback, errorCallback) {
-			if (!initialized) {
-				errorCallback('storage_api_not_initialized', 'The storage engine has not been initialized');
-			} 
+	    save : function(type, obj, successCallback, errorCallback) { 
+	    	if (!database) {
+	    		errorCallback('storage_api_not_initialized', 'The storage engine has not been initialized');
+	    	}
 	    	if (!obj.id) {
 	    		delete obj.id ;
 	    	} else {
@@ -75,29 +71,23 @@ storageEngine = function() {
 	    	};
 	    },
 	    findAll : function(type, successCallback, errorCallback) { 
-	    	if (!initialized) {
-				errorCallback('storage_api_not_initialized', 'The storage engine has not been initialized');
-			} 
-	    	var request = window.indexedDB.open(databasename);
-			request.onsuccess = function(event) {
-		    	var result = [];
-		    	var tx = database.transaction(type);
-		    	var objectStore = tx.objectStore(type);
-		    	objectStore.openCursor().onsuccess = function(event) {
-		    		var cursor = event.target.result;
-		    		if (cursor) {
-		    			result.push(cursor.value);
-		    			cursor.continue();
-		    		} else {
-		    			successCallback(result);
-		    		}
-		    	};
-			}
+	    	if (!database) {
+	    		errorCallback('storage_api_not_initialized', 'The storage engine has not been initialized');
+	    	}
+	    	var result = [];
+	    	var tx = database.transaction(type);
+	    	var objectStore = tx.objectStore(type);
+	    	objectStore.openCursor().onsuccess = function(event) {
+	    		var cursor = event.target.result;
+	    		if (cursor) {
+	    			result.push(cursor.value);
+	    			cursor.continue();
+	    		} else {
+	    			successCallback(result);
+	    		}
+	    	};				
 	    },
-	    delete : function(type, id, successCallback, errorCallback) {
-	    	if (!initialized) {
-				errorCallback('storage_api_not_initialized', 'The storage engine has not been initialized');
-			} 
+	    delete : function(type, id, successCallback, errorCallback) { 
 	    	var obj = {};
 	    	obj.id = id;
 	    	var tx = database.transaction([type], "readwrite");
@@ -117,43 +107,37 @@ storageEngine = function() {
 	    	};
 	    },
 	    findByProperty : function(type, propertyName, propertyValue, successCallback, errorCallback) {
-	    	if (!initialized) {
-				errorCallback('storage_api_not_initialized', 'The storage engine has not been initialized');
-			} 
-	    	var request = window.indexedDB.open(databasename);
-			request.onsuccess = function(event) {
-		    	var result = [];
-		    	var tx = database.transaction(type);
-		    	var objectStore = tx.objectStore(type);
-		    	objectStore.openCursor().onsuccess = function(event) {
-		    		var cursor = event.target.result;
-		    		if (cursor) {
-		    			if (cursor.value[propertyName] == propertyValue) {
-		    				result.push(cursor.value);
-		    			}
-		    			cursor.continue();
-		    		} else {
-		    			successCallback(result);
-		    		}
-		    	};
-			}
+	    	if (!database) {
+	    		errorCallback('storage_api_not_initialized', 'The storage engine has not been initialized');
+	    	}
+	    	var result = [];
+	    	var tx = database.transaction(type);
+	    	var objectStore = tx.objectStore(type);
+	    	objectStore.openCursor().onsuccess = function(event) {
+	    		var cursor = event.target.result;
+	    		if (cursor) {
+	    			if (cursor.value[propertyName] == propertyValue) {
+	    				result.push(cursor.value);
+	    			}
+	    			cursor.continue();
+	    		} else {
+	    			successCallback(result);
+	    		}
+	    	};
 	    },
 		findById : function (type, id, successCallback, errorCallback)	{
-			if (!initialized) {
+			if (!database) {
 				errorCallback('storage_api_not_initialized', 'The storage engine has not been initialized');
-			} 
-			var request = window.indexedDB.open(databasename);
-			request.onsuccess = function(event) {
-				var tx = database.transaction([type]);
-				var objectStore = tx.objectStore(type);
-				var request = objectStore.get(id);
-					request.onsuccess = function(event) {
-					successCallback(event.target.result);
-				}
-				request.onerror = function(event) {
-					errorCallback('object_not_stored', 'It is not possible to locate the requested object');
-				};
 			}
+			var tx = database.transaction([type]);
+			var objectStore = tx.objectStore(type);
+			var request = objectStore.get(id);
+				request.onsuccess = function(event) {
+				successCallback(event.target.result);
+			}
+			request.onerror = function(event) {
+				errorCallback('object_not_stored', 'It is not possible to locate the requested object');
+			};				
 		}
 	}
 }();

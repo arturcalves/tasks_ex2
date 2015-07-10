@@ -102,7 +102,7 @@
 			</nav>
 		</section>
 	</main>
-	<footer>Você tem <span id="taskCount"></span> tarefas</footer>
+	<footer>Você tem <span id="taskCount">0</span> tarefas</footer>
 </body>
 <script>
 if (window.indexedDB) {
@@ -124,8 +124,9 @@ if (window.indexedDB) {
 }
 function initMetodo(){
 	$(document).ready(function() {
-		tasksController.init($('#taskPage'));
-		tasksController.loadTasks();
+		tasksController.init($('#taskPage'), function() {
+			tasksController.loadTasks();
+		});
 	});
 }
 </script>
