@@ -71,21 +71,23 @@ storageEngine = function() {
 	    	};
 	    },
 	    findAll : function(type, successCallback, errorCallback) { 
-	    	if (!database) {
-	    		errorCallback('storage_api_not_initialized', 'The storage engine has not been initialized');
-	    	}
-	    	var result = [];
-	    	var tx = database.transaction(type);
-	    	var objectStore = tx.objectStore(type);
-	    	objectStore.openCursor().onsuccess = function(event) {
-	    		var cursor = event.target.result;
-	    		if (cursor) {
-	    			result.push(cursor.value);
-	    			cursor.continue();
-	    		} else {
-	    			successCallback(result);
-	    		}
-	    	};				
+	    	request = indexedDB.open(window.location.hostname+'DB');
+			request.onsuccess = function(event) {
+				database = request.result;
+				var result = [];
+		    	var tx = database.transaction(type);
+		    	var objectStore = tx.objectStore(type);
+		    	objectStore.openCursor().onsuccess = function(event) {
+		    		var cursor = event.target.result;
+		    		if (cursor) {
+		    			result.push(cursor.value);
+		    			cursor.continue();
+		    		} else {
+		    			successCallback(result);
+		    		}
+		    	};				
+			}
+
 	    },
 	    delete : function(type, id, successCallback, errorCallback) { 
 	    	var obj = {};
