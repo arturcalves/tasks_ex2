@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <title>Tarefas</title>
 <link rel="stylesheet" type="text/css" href="styles/02-tasks.css" media="screen" />
-<script type="text/javascript" src="/scripts/jquery-2.1.4.min.js"></script>
-<script type="text/javascript" src="/scripts/jquery-tmpl.js"></script>
-<script type="text/javascript" src="/scripts/jquery-serialization.js"></script>
-<script type="text/javascript" src="/scripts/date.js"></script>
-<script type="text/javascript" src="/scripts/tasks-controller.js"></script>
-<script type="text/javascript" src="/scripts/jquery.validate.js"></script>
-<script type="text/javascript" src="/scripts/tasks-webstorage.js"></script>
-<script type="text/javascript" src="/scripts/tasks-indexeddb.js"></script>
+<script type="text/javascript" src="scripts/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="scripts/jquery-tmpl.js"></script>
+<script type="text/javascript" src="scripts/jquery-serialization.js"></script>
+<script type="text/javascript" src="scripts/date.js"></script>
+<script type="text/javascript" src="scripts/tasks-controller.js"></script>
+<script type="text/javascript" src="scripts/jquery.validate.js"></script>
+<script type="text/javascript" src="scripts/tasks-webstorage.js"></script>
+<script type="text/javascript" src="scripts/tasks-indexeddb.js"></script>
 
 </head>
 <body>
@@ -22,6 +22,15 @@
 		<section id="taskCreation" class="not">
 			<form id="taskForm">
 				<input type="hidden" name="id" />
+				<!--*********************************************************-->
+				<!-- TAREFA 4 - Marcar tarefa como completada                -->
+				<!-- adicionado campo de formulario com o name 'completed'   -->
+				<!-- isso fará com que os objetos de tasks tenham mais um    -->
+				<!-- atributo de mesmo nome                                  -->
+				<!-- o campo é do tipo hidden pois não poderá ser editado e  -->
+				<!-- e sempre que uma tarefa for adicionada receberá o valor --> 
+				<!-- false                                                   -->
+				<!--*********************************************************-->
 				<input type="hidden" name="completed" value='false' />
 				<div>
 					<label>Tarefa</label> 
@@ -67,9 +76,23 @@
 			</nav>
 		</section>
 	</main>
+	<!--*********************************************************-->
+	<!-- TAREFA 1 - Contagem no rodapé                           -->
+	<!-- no rodapé foi adicionado um elemento com id  taskCount  -->
+	<!-- que receberá o valor calculado da quantidade de tarefas -->
+	<!--*********************************************************-->
 	<footer>Você tem <span id="taskCount">0</span> tarefas</footer>
 </body>
 <script>
+//*********************************************************
+// TAREFA 6 - Persistencia com IndexedDB
+// Da forma que foi proposto, caso o navegador tenha compatibilidade com o indexdb
+// tenta-se iniciar o uso da api do indexeddb
+// caso não contrário, verifica-se a compatibilidade como localStorage
+// e faz-se o uso da api do webstorage
+// em ambos os casos, em caso de sucesso executa o metodo initMetodo, 
+// que executa a funcao init e na sequencia carrega a tabela com a funcao loadTasks
+// ********************************************************
 if (window.indexedDB) {
 	$.getScript( "scripts/tasks-indexeddb.js" )
 	.done(function( script, textStatus ) {
@@ -103,6 +126,12 @@ function initMetodo(){
 	<td>
 		<nav>
 			<a href="#" class="editRow" data-task-id="${id}">Editar</a>
+				<!--*********************************************************-->
+				<!-- TAREFA 4 - Marcar tarefa como completada                -->
+				<!-- adicionado classe completeRow para associar funcao ao   -->
+				<!-- clique, e adicionado atributo data-task-id para saber   -->
+				<!-- o id da tarefa que deve ser completada                  -->
+				<!--*********************************************************-->
 			<a href="#" class="completeRow" data-task-id="${id}">Completar</a>
 			<a href="#" class="deleteRow" data-task-id="${id}">Deletar</a>
 		</nav>
